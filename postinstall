@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Bash script to remove the EnCase agent.
+
+# Last tested using macOS Sonoma 14.3.1 (23D60).
+
+# Run as an administrator using sudo. Errors will be ignored.
+
+# Stop the agent service and remove the associated plist file.
+
+launchctl unload -F /Library/LaunchDaemons/com.GSI.Servlet.plist
+rm -f /Library/LaunchDaemons/com.GSI.Servlet.plist
+
+# Remove the agent executable and public key.
+
+rm -f /usr/local/sbin/enosxintel
+rm -f /usr/local/sbin/enosxintel.SafePublicKey
+
+rm -f /usr/local/sbin/enmacos
+rm -f /usr/local/sbin/enmacos.SafePublicKey
+
+# Unload the kernel extension.
+
+kextunload -b com.GSI.kext.gsidrv
+
+# Remove the kernel extension, which is actually a folder.
+
+rm -fr /Library/Extensions/gsidrv.kext
+
+# Discard receipt data for the agent packages.
+
+pkgutil --forget com.GSI.encaseServlet.safekey.pkg
+pkgutil --forget com.GSI.encaseServlet.preflight.pkg
+pkgutil --forget com.GSI.encaseServlet.enosxintel.pkg
+pkgutil --forget com.GSI.encaseServlet.com.GSI.Servlet.pkg
+pkgutil --forget com.GSI.encaseServlet.gsidrv.pkg
+pkgutil --forget com.OpenText.EnCase.service 
+pkgutil --forget com.OpenText.EnCase.agent-intel64
+pkgutil --forget com.OpenText.EnCase.agent-arm64
+
+exit 0
